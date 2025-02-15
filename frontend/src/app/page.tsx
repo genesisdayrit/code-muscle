@@ -18,6 +18,7 @@ const initialState: ExerciseState = {
   cursorPosition: [0, 0],
   commandHistory: [],
   isComplete: false,
+  mode: "normal",
 };
 
 export default function Home() {
@@ -29,12 +30,17 @@ export default function Home() {
   }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    const command = e.key;
-    if (["h", "j", "k", "l"].includes(command)) {
-      const newState = processCommand(command, exerciseState);
-      setExerciseState(newState);
-    }
+    // For Insert Mode, we want to capture all keys (except maybe special ones)
+    // For simplicity, we assume that in Insert Mode, every key is inserted
+    // while in Normal and Visual Mode, we only capture specific commands.
+    let command = e.key;
+
+    // Prevent default browser actions
     e.preventDefault();
+
+    // Process command based on current mode
+    const newState = processCommand(command, exerciseState);
+    setExerciseState(newState);
   };
 
   return (
@@ -42,9 +48,18 @@ export default function Home() {
       <h1 className="text-2xl font-bold mb-4">Code-Muscle: Vim Training Tool (Phase 1)</h1>
 
       <div className="mb-4 p-4 border rounded bg-gray-100">
-        <h2 className="text-xl font-semibold">Exercise: Basic Movement</h2>
+        <h2 className="text-xl font-semibold">Exercise: Basic Movement & Editing</h2>
         <p>
-          Use <code>h</code> (left), <code>j</code> (down), <code>k</code> (up), <code>l</code> (right) to move the cursor.
+          <strong>Normal Mode:</strong> Use <code>h</code>, <code>j</code>, <code>k</code>, <code>l</code> to move; press <code>i</code> to insert; press <code>v</code> for visual mode.
+        </p>
+        <p>
+          <strong>Insert Mode:</strong> Type text; press <code>Escape</code> to return to normal.
+        </p>
+        <p>
+          <strong>Visual Mode:</strong> Use movement keys to adjust selection; press <code>Escape</code> to cancel.
+        </p>
+        <p>
+          <em>Current Mode: {exerciseState.mode.toUpperCase()}</em>
         </p>
       </div>
 
